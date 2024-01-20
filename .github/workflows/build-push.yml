@@ -31,10 +31,10 @@ jobs:
 
       - name: Identify current Dockerfile version
         run: |
-          DOCKERHUB_REPO="myoung34/github-runner"
-          IMAGE_INFO=$(curl -s "https://hub.docker.com/v2/repositories/${DOCKERHUB_REPO}/tags")
-          LATEST_VERSION=($(echo "$IMAGE_INFO" | jq -r '.results[].name' | sort -V))
-          echo "Latest version of ${DOCKERHUB_REPO}: ${LATEST_VERSION}"
+          API_URL="https://api.github.com/repos/actions/runner/releases/latest"
+          RELEASE_INFO=$(curl -s "$API_URL") # Fetch the latest release information from GitHub API
+          LATEST_VERSION=$(echo "$RELEASE_INFO" | jq -r '.tag_name' | sed -E 's/[^0-9.]//g' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+')
+          echo "Latest version is : ${LATEST_VERSION}"
           echo "LATEST_VERSION=${LATEST_VERSION}" >> $GITHUB_ENV
       
       - name: Set up Docker Buildx
